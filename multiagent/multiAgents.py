@@ -75,6 +75,48 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
+     # 1. Thắng / Thua
+        if successorGameState.isWin():
+            return float('inf')
+        if successorGameState.isLose():
+            return float('-inf')
+
+        score = successorGameState.getScore()
+
+        # 2. Phạt nhẹ khi đứng yên
+        if action == Directions.STOP:
+            score -= 10
+
+        # 3. Thức ăn: gần hạt gần nhất + càng ít hạt còn lại càng tốt
+        foodList = newFood.asList()
+        if foodList:
+            minFoodDist = min(manhattanDistance(newPos, f) for f in foodList)
+            score += 10.0 / max(minFoodDist, 1)
+        score -= 4 * len(foodList)
+
+        # 4. Capsule: khuyến khích ăn nhẹ
+        capsules = successorGameState.getCapsules()
+        if capsules:
+            minCapDist = min(manhattanDistance(newPos, c) for c in capsules)
+            score += 3.0 / max(minCapDist, 1)
+        score -= 10 * len(capsules)
+
+        # 5. Ma
+        for ghostState, scaredTime in zip(newGhostStates, newScaredTimes):
+            dist = manhattanDistance(newPos, ghostState.getPosition())
+
+            if scaredTime > 0:
+                # Ma đang sợ: đuổi theo nếu kịp trước khi hết sợ
+                if dist < scaredTime:
+                    score += 100.0 / (dist + 1)
+            else:
+                # Ma thường: tuyệt đối không đi sát, và né dần khi lại gần
+                if dist <= 1:
+                    return float('-inf')
+                if dist <= 4:
+                    score -= 6.0 / dist
+
+        return score
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState: GameState):
@@ -163,6 +205,43 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
+        numAgents = gameState.getNumAgents()
+
+        def expectimax(state, agentIndex, depth):
+            # Điều kiện dừng: thắng/thua hoặc đã tìm đủ độ sâu
+            if state.isWin() or state.isLose() or depth == self.depth:
+                return self.evaluationFunction(state)
+
+            actions = state.getLegalActions(agentIndex)
+            if not actions:
+                return self.evaluationFunction(state)
+
+            nextAgent = (agentIndex + 1) % numAgents
+            # Chỉ tăng độ sâu sau khi tất cả agent (Pacman + mọi ma) đã đi xong
+            nextDepth = depth + 1 if nextAgent == 0 else depth
+
+            values = [expectimax(state.generateSuccessor(agentIndex, a), nextAgent, nextDepth)
+                      for a in actions]
+
+            if agentIndex == 0:
+                # Pacman: MAX
+                return max(values)
+            # Ma: EXPECTATION (chọn đều ngẫu nhiên)
+            return sum(values) / len(values)
+
+        # Ở gốc: Pacman chọn hành động có giá trị kỳ vọng cao nhất,
+        # nếu hòa thì chọn ngẫu nhiên để tránh đứng yên ở góc
+        bestScore = float('-inf')
+        bestActions = []
+        for action in gameState.getLegalActions(0):
+            successor = gameState.generateSuccessor(0, action)
+            value = expectimax(successor, 1, 0)
+            if value > bestScore:
+                bestScore = value
+                bestActions = [action]
+            elif value == bestScore:
+                bestActions.append(action)
+        return random.choice(bestActions)
         util.raiseNotDefined()
 
 def betterEvaluationFunction(currentGameState: GameState):
