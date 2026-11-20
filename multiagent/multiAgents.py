@@ -10,7 +10,34 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
+# ==============================================================================
+# BẢN KHAI BÁO SỬ DỤNG CÔNG CỤ (CHUẨN ĐẦU RA CLO4)
+#
+# 1. Phương pháp thực hiện:
+#    - Ý tưởng định hướng, thảo luận xây dựng mã giả và giải pháp cho các bài toán
+#      tìm kiếm đa tác nhân (ReflexAgent, MinimaxAgent, AlphaBetaAgent,
+#      ExpectimaxAgent và betterEvaluationFunction) có sự tham gia hỗ trợ của
+#      công cụ AI.
+#    - Công cụ AI tiếp tục được sử dụng để hỗ trợ hiện thực hóa cú pháp Python
+#      dựa trên cấu trúc mã giả đệ quy đã thống nhất nhằm hoàn thiện chương trình.
+#
+# 2. Phạm vi hỗ trợ của công cụ:
+#    - Thảo luận cấu trúc đệ quy cho bài toán nhiều tác nhân (1 Pac-Man, nhiều ma),
+#      điều kiện cắt tỉa Alpha-Beta nghiêm ngặt và tinh chỉnh trọng số hàm lượng giá.
+#    - Chuyển đổi mã giả thành mã nguồn Python hoàn chỉnh trong tệp multiAgents.py
+#      và hỗ trợ xử lý các lỗi kỹ thuật, cú pháp.
+#
+# 3. Phương pháp kiểm chứng kết quả độc lập:
+#    - Kiểm chứng qua bộ chấm tự động (autograder.py): Tự chạy kiểm thử độc lập
+#      cho từng câu (q1 đến q5) và toàn bộ dự án để đảm bảo mã nguồn vượt qua
+#      các test case, mở đúng số lượng trạng thái yêu cầu và đạt ngưỡng điểm trung
+#      bình trên 1000 điểm.
+#    - Kiểm chứng trực quan qua giao diện Pac-Man (pacman.py): Trực tiếp chạy và
+#      quan sát các tác nhân (ReflexAgent, MinimaxAgent, AlphaBetaAgent,
+#      ExpectimaxAgent) hoạt động trên các bản đồ thực tế (testClassic,
+#      minimaxClassic, trappedClassic, smallClassic, openClassic) để đối chiếu
+#      hành vi né ma, săn ma hoảng sợ và tỷ lệ thắng thực tế.
+# ==============================================================================
 
 from util import manhattanDistance
 from game import Directions
