@@ -178,7 +178,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-         numAgents = gameState.getNumAgents()
+        numAgents = gameState.getNumAgents()
         def minimax(state, agentIndex, depth):
             if state.isWin() or state.isLose() or depth == self.depth:
                 return self.evaluationFunction(state)
@@ -202,6 +202,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 bestAction = action
         return bestAction
 
+
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
@@ -209,10 +210,88 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
     def getAction(self, gameState: GameState):
         """
-        Returns the minimax action using self.depth and self.evaluationFunction
+        Returns the minimax action using self.depth and
+        self.evaluationFunction
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        numAgents = gameState.getNumAgents()
+
+        def alphaBeta(state, agentIndex, depth, alpha, beta):
+
+            # Dieu kien dung
+            if state.isWin() or state.isLose() or depth == self.depth:
+                return self.evaluationFunction(state)
+
+            actions = state.getLegalActions(agentIndex)
+
+            if not actions:
+                return self.evaluationFunction(state)
+
+            nextAgent = (agentIndex + 1) % numAgents
+            nextDepth = depth + 1 if nextAgent == 0 else depth
+
+            # MAX: Pacman
+            if agentIndex == 0:
+                value = float('-inf')
+
+                for action in actions:
+                    successor = state.generateSuccessor(agentIndex, action)
+
+                    childValue = alphaBeta(
+                        successor, nextAgent, nextDepth, alpha, beta
+                    )
+
+                    value = max(value, childValue)
+
+                    # Alpha-Beta pruning
+                    if value > beta:
+                        return value
+
+                    alpha = max(alpha, value)
+
+                return value
+
+            # MIN: Ghost
+            else:
+                value = float('inf')
+
+                for action in actions:
+                    successor = state.generateSuccessor(agentIndex, action)
+
+                    childValue = alphaBeta(
+                        successor, nextAgent, nextDepth, alpha, beta
+                    )
+
+                    value = min(value, childValue)
+
+                    # Alpha-Beta pruning
+                    if value < alpha:
+                        return value
+
+                    beta = min(beta, value)
+
+                return value
+
+        # Tim hanh dong tot nhat cua Pacman
+        alpha = float('-inf')
+        beta = float('inf')
+
+        bestScore = float('-inf')
+        bestAction = None
+
+        for action in gameState.getLegalActions(0):
+            successor = gameState.generateSuccessor(0, action)
+
+            value = alphaBeta(successor, 1, 0, alpha, beta)
+
+            if value > bestScore:
+                bestScore = value
+                bestAction = action
+
+            alpha = max(alpha, bestScore)
+
+        return bestAction
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
